@@ -4,5 +4,5 @@ using Unity.Entities;
 [BurstCompile]
 public struct GravityComponent : IComponentData
 {
-    public float mass;
+    public float gravityMultiplier;
 }

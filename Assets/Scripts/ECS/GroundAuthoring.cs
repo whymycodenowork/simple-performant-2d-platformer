@@ -30,7 +30,7 @@ public class GroundAuthoring : MonoBehaviour
 
             AddComponent(entity, new HitboxComponent
             {
-                size = new float2(authoring.transform.localScale.x, authoring.transform.localScale.x) // Set the size of the hitbox
+                size = new float2(authoring.transform.localScale.x, authoring.transform.localScale.y) // Set the size of the hitbox
             });
 
             AddComponent(entity, new GroundComponent());

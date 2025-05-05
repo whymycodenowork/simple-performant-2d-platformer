@@ -5,43 +5,33 @@ using UnityEngine;
 [UpdateInGroup(typeof(SimulationSystemGroup))]
 public partial struct PlayerMovementSystem : ISystem
 {
-    public readonly void OnCreate(ref SystemState state)
-    {
-        state.RequireForUpdate<PlayerMovementComponent>();
-    }
-
     public readonly void OnUpdate(ref SystemState state)
     {
         (bool left, bool right, bool jump) = GetInput();
-        foreach ((RefRW<PlayerMovementComponent> movement, RefRW<VelocityComponent> velocityComponent) in SystemAPI.Query<RefRW<PlayerMovementComponent>, RefRW<VelocityComponent>>())
+        foreach ((RefRW<VelocityComponent> velocity, RefRO<PlayerMovementComponent> playerMoveComp) in
+            SystemAPI.Query<RefRW<VelocityComponent>, RefRO<PlayerMovementComponent>>())
         {
-            float2 velocity = float2.zero;
-
-            if (jump && movement.ValueRO.canJump)
+            if (/*playerMoveComp.ValueRO.Grounded && */jump)
             {
-                velocity.y += movement.ValueRO.jumpForce;
-                Debug.Log("Jumping!");
+                velocity.ValueRW.velocity.y = playerMoveComp.ValueRO.jumpForce; // Jump velocity
             }
             if (left)
             {
-                velocity.x -= movement.ValueRO.moveSpeed;
+                velocity.ValueRW.velocity.x -= playerMoveComp.ValueRO.moveSpeed;
             }
-
-            if (right)
+            else if (right)
             {
-                velocity.x += movement.ValueRO.moveSpeed;
+                velocity.ValueRW.velocity.x += playerMoveComp.ValueRO.moveSpeed;
             }
-
-            velocityComponent.ValueRW.velocity += velocity;
         }
     }
 
     private readonly (bool left, bool right, bool jump) GetInput()
     {
         return (
-            left: Input.GetKey(KeyCode.LeftArrow),
-            right: Input.GetKey(KeyCode.RightArrow),
-            jump: Input.GetKeyDown(KeyCode.UpArrow)
+            left: Input.GetKey(KeyCode.A),
+            right: Input.GetKey(KeyCode.D),
+            jump: Input.GetKeyDown(KeyCode.W)
         );
     }
 }
